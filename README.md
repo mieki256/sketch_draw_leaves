@@ -15,6 +15,8 @@ Screenshots
 
 ![Screenshots](./screenshots/sketch_draw_leaves_ss01.png)
 
+[Screenshot movie (YouTube)](https://youtu.be/GQ458NYrCw8)
+
 Environment / Requirement
 -------------------------
 

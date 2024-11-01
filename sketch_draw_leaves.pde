@@ -1,10 +1,11 @@
-// Last updated: <2024/11/01 09:46:43 +0900>
+// Last updated: <2024/11/01 20:10:08 +0900>
 //
 // Draw leaves
 //
 // request library : ControlP5
 //
-// by mieki256. License: CC0
+// by mieki256
+// License: CC0
 
 import controlP5.*;
 
