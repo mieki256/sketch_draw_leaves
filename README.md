@@ -32,8 +32,8 @@ Usage
 -----
 
 * Processing で sketch\_draw\_leaves.pde を読み込んで実行してください。
-* 葉っぱ画像として leaf.png と leaf2.png が、下絵画像として bg.png が必要。.pde と同じ階層に置いてください。
-* キャンバスの中でマウスボタンを押し続ければ葉っぱが配置されます。
+* 葉っぱ画像として leaf.png と leaf2.png、下絵画像として bg.png が必要です。data/ 以下に置いてください。
+* キャンバス上でマウスボタンを押し続ければ葉っぱが配置されます。
 
 ### Shortcut keys
 
