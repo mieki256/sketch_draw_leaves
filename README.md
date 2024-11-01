@@ -13,7 +13,7 @@ Processinとパーリンノイズで葉っぱ画像を揺らして、それら�
 Screenshots
 -----------
 
-![Screenshots](./screenshots/sketch_draw_leaves_ss01.png)
+![Screenshots](./screenshots/sketch_draw_leaves_ss02.png)
 
 [Screenshot movie (YouTube)](https://youtu.be/GQ458NYrCw8)
 
@@ -32,16 +32,19 @@ Usage
 -----
 
 * Processing で sketch\_draw\_leaves.pde を読み込んで実行してください。
-* 葉っぱ画像として leaf.png と leaf2.png が必要です。.pde と同じ階層に置いてください。
-* キャンバスの中でマウスクリックすれば葉っぱが配置されます。
+* 葉っぱ画像として leaf.png と leaf2.png が、下絵画像として bg.png が必要。.pde と同じ階層に置いてください。
+* キャンバスの中でマウスボタンを押し続ければ葉っぱが配置されます。
 
 ### Shortcut keys
 
-* Cキーで葉っぱ画像変更。
-* Rキーでリセット。
-* Fキーでフレームレートを、24、12、8FPSに変更。
-* Sキーで、一連のフレームをアルファチャンネル付き連番画像として保存。frames/ 以下に保存される。
-* ESCキーかQキーで終了。
+* Cキー : 葉っぱ画像変更。
+* Zキー : Undo
+* Fキー : フレームレートを、24, 12, 8 FPS に変更。
+* Sキー : 一連のフレームをアルファチャンネル付き連番画像として保存。frames/ 以下に保存される。
+* Rキー : Reset
+* Tキー : テキストメッセージ表示のON/OFF
+* ESCキー, Qキー : Exit
+* マウスホイール : ブラシサイズ(葉っぱ配置範囲)の変更
 
 License
 -------
