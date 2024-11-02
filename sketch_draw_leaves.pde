@@ -1,4 +1,4 @@
-// Last updated: <2024/11/02 20:04:58 +0900>
+// Last updated: <2024/11/02 23:23:12 +0900>
 //
 // Draw leaves and animation
 //
@@ -13,8 +13,9 @@ int[] fps_list = new int[]{ 24, 12, 8 };  // framerate list
 int fps_kind = 0;
 
 int leaf_max = 5000;          // leaf number max
-float def_ang = 90 + 45;      // leaf base angle
+float def_ang = -45.0;        // leaf base angle
 float def_spd = 0.03;         // animation speed
+float def_rot_range = 75.0;
 float def_brushsize = 100;
 float brushsize_max = 300.0;
 
@@ -40,11 +41,12 @@ int scrh;
 Leaf[] leaves = new Leaf[leaf_max];
 
 ControlP5 cp5;
-Slider slider_ba;
 Slider slider_spd;
-Slider slider_bsize;
 Slider slider_shakex;
 Slider slider_shakey;
+Slider slider_rotrange;
+Slider slider_baseang;
+Slider slider_bsize;
 
 float dis_x0;
 float dis_y0;
@@ -107,10 +109,19 @@ void setup() {
     .setColorActive(color(0, 200, 0))
     .setFont(cf1);
 
-  slider_ba = cp5.addSlider("angle")
-    .setRange(0, 180)
-    .setValue(def_ang)
+  slider_rotrange = cp5.addSlider("rot range")
+    .setRange(0.0, 180.0)
+    .setValue(def_rot_range)
     .setPosition(x, y + 3 * yd)
+    .setSize(180, 20)
+    .setColorForeground(color(0, 160, 0))
+    .setColorActive(color(0, 200, 0))
+    .setFont(cf1);
+
+  slider_baseang = cp5.addSlider("set angle")
+    .setRange(-90, 90)
+    .setValue(def_ang)
+    .setPosition(x, y + 4 * yd)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
@@ -120,7 +131,7 @@ void setup() {
   slider_bsize = cp5.addSlider("brush size")
     .setRange(1, brushsize_max)
     .setValue(def_brushsize)
-    .setPosition(x, y + 4 * yd)
+    .setPosition(x, y + 5 * yd)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
@@ -131,7 +142,7 @@ void setup() {
   dis_x0 = x - pad;
   dis_y0 = y - pad;
   dis_x1 = x + w + 3 * pad;
-  dis_y1 = y + 5 * yd + pad;
+  dis_y1 = y + 6 * yd + pad;
 }
 
 void draw() {
@@ -217,24 +228,27 @@ void draw() {
 
   // draw text
   if (textfg) {
-    float tx = 8;
-    float td = 20;
-    noStroke();
-    fill(255);
-    textSize(16);
-    String mes = "Leaf: " + leaf_index;
-    if (leaf_index == 0) mes += " ... Please mouse button press";
-    text(mes, tx, 1 * td);
-    text(savemes, tx, 2 * td);
-    text("Q,ESC: Exit / R: Reset / Z: Undo / T: Text on/off / S: Save frames", tx, 4 * td);
-    text("C: Change image [" + imgkind + "] / F: Framerate [" + fps_list[fps_kind] + " fps]", tx, 5 * td);
-    text("Wheel: Brush size", tx, 6 * td);
-
-    // draw brush image
+    draw_message(savemes);
     draw_brush_preview();
   }
 
   if (exitfg) exit();
+}
+
+void draw_message(String savemes) {
+  float tx = 8;
+  float td = 20;
+  noStroke();
+  fill(255);
+  textSize(16);
+
+  String mes = "Leaf: " + leaf_index;
+  if (leaf_index == 0) mes += " ... Please mouse button press";
+  text(mes, tx, 1 * td);
+  text(savemes, tx, 2 * td);
+  text("Q,ESC: Exit / R: Reset / Z: Undo / T: Text on/off / S: Save frames", tx, 4 * td);
+  text("C: Change image [" + imgkind + "] / F: Framerate [" + fps_list[fps_kind] + " fps]", tx, 5 * td);
+  text("Wheel: Brush size", tx, 6 * td);
 }
 
 void draw_brush_preview() {
@@ -318,21 +332,22 @@ void set_leaves(float bx, float by, PImage img) {
   if (leaf_index >= leaf_max) return;
 
   float tintv = 255;
-  set_leaf(leaf_index, img, bx, by, tintv);
+  float ang = -1.0 * slider_baseang.getValue();
+  set_leaf(leaf_index, img, bx, by, tintv, ang);
   leaf_index++;
 
   if (tint_sort) sort_leaves_tint();
 }
 
-void set_leaf(int i, PImage img, float bx, float by, float tintv) {
+void set_leaf(int i, PImage img, float bx, float by, float tintv, float ang) {
   float bsize = slider_bsize.getValue();
   float r = random(bsize);
-  float ang = random(360.0);
-  float x = bx + r * cos(radians(ang));
-  float y = by + r * sin(radians(ang));
+  float a = random(360.0);
+  float x = bx + r * cos(radians(a));
+  float y = by + r * sin(radians(a));
   float rv = random(65536);
   float spd = def_spd;
-  float base_ang = slider_ba.getValue();
+  float base_ang = ang;
   leaves[i] = new Leaf(img, x, y, rv, spd, tintv, base_ang);
 }
 
@@ -383,7 +398,7 @@ class Leaf {
 
   void update(float speed) {
     float n0 = noise(tm * spd * speed);
-    float a = 75.0;
+    float a = slider_rotrange.getValue();
     ang = base_ang + (a * n0) - (a / 2);
 
     float n1 = noise(tm * spd * speed * 0.8);
@@ -408,7 +423,7 @@ class Leaf {
     translate(bx + x, by + y);
     rotate(radians(ang));
     tint(tintv);
-    image(img, 0, -img.height / 2);
+    image(img, -img.width / 2, 0);
     pop();
   }
 
@@ -418,7 +433,7 @@ class Leaf {
     pg.translate(bx + x, by + y);
     pg.rotate(radians(ang));
     pg.tint(tintv);
-    pg.image(img, 0, -img.height / 2);
+    pg.image(img, -img.width / 2, 0);
     pg.pop();
   }
 }
