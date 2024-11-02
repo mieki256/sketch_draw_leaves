@@ -1,4 +1,4 @@
-// Last updated: <2024/11/02 23:23:12 +0900>
+// Last updated: <2024/11/03 01:01:19 +0900>
 //
 // Draw leaves and animation
 //
@@ -31,6 +31,7 @@ boolean resetfg = false;
 boolean exitfg = false;
 boolean textfg = true;
 boolean saveframe_enable =  false;
+boolean fixed_tint = false;
 
 int imgkind = 0;
 int leaf_index = 0;
@@ -47,6 +48,9 @@ Slider slider_shakey;
 Slider slider_rotrange;
 Slider slider_baseang;
 Slider slider_bsize;
+Slider slider_hsb_h;
+Slider slider_hsb_s;
+Slider slider_hsb_b;
 
 float dis_x0;
 float dis_y0;
@@ -57,9 +61,9 @@ float shakingx = 100.0;
 float shakingy = 50.0;
 
 void setup() {
-  // fullScreen(P2D);
+  fullScreen(P2D);
   // size(1280, 720, P2D);
-  size(1600, 900, P2D);
+  // size(1600, 900, P2D);
 
   scrw = width;
   scrh = height;
@@ -74,6 +78,10 @@ void setup() {
   frameRate(fps_list[fps_kind]);
 
   // init ControlP5 (GUI library)
+  init_gui();
+}
+
+void init_gui() {
   cp5 = new ControlP5(this);
   PFont myfont = createFont("Arial", 14, true);
   ControlFont cf1 = new ControlFont(myfont, 14);
@@ -82,67 +90,104 @@ void setup() {
   float yd = 40;
   float w = 180;
 
+  // Set area to disable brush
+  dis_x0 = x - 16;
+  dis_y0 = y - 16;
+
   slider_spd = cp5.addSlider("speed")
     .setRange(0.1, 2.0)
     .setValue(1.0)
-    .setPosition(x, y + 0 * yd)
+    .setPosition(x, y)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
     .setFont(cf1);
+  y += yd;
 
   slider_shakex = cp5.addSlider("shaking x")
     .setRange(0.0, 300.0)
     .setValue(shakingx)
-    .setPosition(x, y + 1 * yd)
+    .setPosition(x, y)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
     .setFont(cf1);
+  y += yd;
 
   slider_shakey = cp5.addSlider("shaking y")
     .setRange(0.0, 300.0)
     .setValue(shakingy)
-    .setPosition(x, y + 2 * yd)
+    .setPosition(x, y)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
     .setFont(cf1);
+  y += yd;
 
   slider_rotrange = cp5.addSlider("rot range")
     .setRange(0.0, 180.0)
     .setValue(def_rot_range)
-    .setPosition(x, y + 3 * yd)
+    .setPosition(x, y)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
     .setFont(cf1);
+  y += yd;
 
   slider_baseang = cp5.addSlider("set angle")
     .setRange(-90, 90)
     .setValue(def_ang)
-    .setPosition(x, y + 4 * yd)
+    .setPosition(x, y)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
     .setFont(cf1)
     .setNumberOfTickMarks(9);
+  y += yd;
 
   slider_bsize = cp5.addSlider("brush size")
     .setRange(1, brushsize_max)
     .setValue(def_brushsize)
-    .setPosition(x, y + 5 * yd)
+    .setPosition(x, y)
     .setSize(180, 20)
     .setColorForeground(color(0, 160, 0))
     .setColorActive(color(0, 200, 0))
     .setFont(cf1);
+  y += yd;
+
+  slider_hsb_h = cp5.addSlider("hue")
+    .setRange(0.0, 360.0)
+    .setValue(180.0)
+    .setPosition(x, y)
+    .setSize(180, 20)
+    .setColorForeground(color(0, 160, 0))
+    .setColorActive(color(0, 200, 0))
+    .setFont(cf1);
+  y += yd;
+
+  slider_hsb_s = cp5.addSlider("saturation")
+    .setRange(0.0, 100.0)
+    .setValue(100.0)
+    .setPosition(x, y)
+    .setSize(180, 20)
+    .setColorForeground(color(0, 160, 0))
+    .setColorActive(color(0, 200, 0))
+    .setFont(cf1);
+  y += yd;
+
+  slider_hsb_b = cp5.addSlider("brightness")
+    .setRange(0.0, 100.0)
+    .setValue(100.0)
+    .setPosition(x, y)
+    .setSize(180, 20)
+    .setColorForeground(color(0, 160, 0))
+    .setColorActive(color(0, 200, 0))
+    .setFont(cf1);
+  y += yd;
 
   // Set area to disable brush
-  float pad = 32;
-  dis_x0 = x - pad;
-  dis_y0 = y - pad;
-  dis_x1 = x + w + 3 * pad;
-  dis_y1 = y + 6 * yd + pad;
+  dis_x1 = x + w + 3 * 32;
+  dis_y1 = y + 16;
 }
 
 void draw() {
@@ -247,8 +292,9 @@ void draw_message(String savemes) {
   text(mes, tx, 1 * td);
   text(savemes, tx, 2 * td);
   text("Q,ESC: Exit / R: Reset / Z: Undo / T: Text on/off / S: Save frames", tx, 4 * td);
-  text("C: Change image [" + imgkind + "] / F: Framerate [" + fps_list[fps_kind] + " fps]", tx, 5 * td);
-  text("Wheel: Brush size", tx, 6 * td);
+  text("H: Fixed tint [" + ((fixed_tint)? "On" : "Off") + "]", tx, 5 * td);
+  text("C: Change image [" + imgkind + "] / F: Framerate [" + fps_list[fps_kind] + " fps]", tx, 6 * td);
+  text("Wheel: Brush size", tx, 7 * td);
 }
 
 void draw_brush_preview() {
@@ -263,9 +309,22 @@ void draw_brush_preview() {
   rect(x, y, w, w);
 
   // draw brush image
-  imageMode(CORNER);
-  noTint();
-  image((imgkind == 0)? img : img2, x, y, w, w);
+  if (fixed_tint) {
+    float hsb_h = slider_hsb_h.getValue();
+    float hsb_s = slider_hsb_s.getValue();
+    float hsb_b = slider_hsb_b.getValue();
+    colorMode(HSB, 360.0, 100.0, 100.0);
+    imageMode(CORNER);
+    tint(hsb_h, hsb_s, hsb_b);
+    image((imgkind == 0)? img : img2, x, y, w, w);
+    colorMode(RGB, 255, 255, 255);
+    noTint();
+  } else {
+    colorMode(RGB, 255, 255, 255);
+    imageMode(CORNER);
+    noTint();
+    image((imgkind == 0)? img : img2, x, y, w, w);
+  }
 
   // draw border
   rectMode(CORNER);
@@ -321,6 +380,9 @@ void keyPressed() {
       if (textfg) cp5.show();
       else cp5.hide();
       break;
+    case 'h':
+      fixed_tint = !fixed_tint;
+      break;
     case 'q':  // exit
       exitfg = true;
       break;
@@ -348,7 +410,10 @@ void set_leaf(int i, PImage img, float bx, float by, float tintv, float ang) {
   float rv = random(65536);
   float spd = def_spd;
   float base_ang = ang;
-  leaves[i] = new Leaf(img, x, y, rv, spd, tintv, base_ang);
+  float hsb_h = slider_hsb_h.getValue();
+  float hsb_s = slider_hsb_s.getValue();
+  float hsb_b = slider_hsb_b.getValue();
+  leaves[i] = new Leaf(img, x, y, rv, spd, tintv, base_ang, hsb_h, hsb_s, hsb_b);
 }
 
 void sort_leaves_tint() {
@@ -374,18 +439,24 @@ class Leaf {
   float tm;
   float spd;
   float tintv;
+  float hsb_h;
+  float hsb_s;
+  float hsb_b;
   float base_ang;
   float x;
   float y;
   float ang;
 
-  Leaf(PImage src_img, float basex, float basey, float tm0, float speed, float tv0, float bs_ang) {
+  Leaf(PImage src_img, float basex, float basey, float tm0, float speed, float tv0, float bs_ang, float tvh, float tvs, float tvb) {
     img = src_img;
     bx = basex;
     by = basey;
     tm = tm0;
     spd = speed;
     tintv = tv0;
+    hsb_h = tvh;
+    hsb_s = tvs;
+    hsb_b = tvb;
     base_ang = bs_ang;
     x = 0.0;
     y = 0.0;
@@ -422,8 +493,16 @@ class Leaf {
     imageMode(CORNER);
     translate(bx + x, by + y);
     rotate(radians(ang));
-    tint(tintv);
-    image(img, -img.width / 2, 0);
+    if (fixed_tint) {
+      colorMode(HSB, 360.0, 100.0, 100.0);
+      tint(hsb_h, hsb_s, hsb_b);
+      image(img, -img.width / 2, 0);
+      colorMode(RGB, 255, 255, 255);
+    } else {
+      colorMode(RGB, 255, 255, 255);
+      tint(tintv);
+      image(img, -img.width / 2, 0);
+    }
     pop();
   }
 
@@ -432,8 +511,16 @@ class Leaf {
     pg.imageMode(CORNER);
     pg.translate(bx + x, by + y);
     pg.rotate(radians(ang));
-    pg.tint(tintv);
-    pg.image(img, -img.width / 2, 0);
+    if (fixed_tint) {
+      pg.colorMode(HSB, 360.0, 100.0, 100.0);
+      pg.tint(hsb_h, hsb_s, hsb_b);
+      pg.image(img, -img.width / 2, 0);
+      pg.colorMode(RGB, 255, 255, 255);
+    } else {
+      pg.colorMode(RGB, 255, 255, 255);
+      pg.tint(tintv);
+      pg.image(img, -img.width / 2, 0);
+    }
     pg.pop();
   }
 }
