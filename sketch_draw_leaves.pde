@@ -1,4 +1,4 @@
-// Last updated: <2024/11/03 01:01:19 +0900>
+// Last updated: <2024/11/03 01:19:49 +0900>
 //
 // Draw leaves and animation
 //
@@ -22,8 +22,7 @@ float brushsize_max = 300.0;
 boolean tint_sort = true;
 // boolean tint_sort = false;
 
-PImage img;
-PImage img2;
+PImage[] img = new PImage[2];
 PImage bgimg;
 PGraphics pg;
 
@@ -69,10 +68,12 @@ void setup() {
   scrh = height;
   // println("size=(" + scrw + ", " + scrh + ")");
 
-  img = loadImage("./leaf.png");
-  img2 = loadImage("./leaf2.png");
-  bgimg = loadImage("./bg.png");
+  // load images
+  img[0] = loadImage("leaf.png");
+  img[1] = loadImage("leaf2.png");
+  bgimg = loadImage("bg.png");
   imgkind = 0;
+
   pg = createGraphics(scrw, scrh, P2D);
   leaf_index = 0;
   frameRate(fps_list[fps_kind]);
@@ -223,7 +224,7 @@ void draw() {
 
   if (brush_enable && mousePressed) {
     if (mouseButton == LEFT) {
-      set_leaves(mx, my, ((imgkind == 0)? img : img2));
+      set_leaves(mx, my, img[imgkind]);
     }
   }
 
@@ -316,14 +317,14 @@ void draw_brush_preview() {
     colorMode(HSB, 360.0, 100.0, 100.0);
     imageMode(CORNER);
     tint(hsb_h, hsb_s, hsb_b);
-    image((imgkind == 0)? img : img2, x, y, w, w);
+    image(img[imgkind], x, y, w, w);
     colorMode(RGB, 255, 255, 255);
     noTint();
   } else {
     colorMode(RGB, 255, 255, 255);
     imageMode(CORNER);
     noTint();
-    image((imgkind == 0)? img : img2, x, y, w, w);
+    image(img[imgkind], x, y, w, w);
   }
 
   // draw border
@@ -362,7 +363,7 @@ void keyPressed() {
   } else {
     switch (key) {
     case 'c':  // change image
-      imgkind = (imgkind + 1) % 2;
+      imgkind = (imgkind + 1) % img.length;
       break;
     case 'f': // change framerate
       fps_kind = (fps_kind + 1) % 3;
