@@ -1,4 +1,4 @@
-// Last updated: <2024/11/02 07:39:33 +0900>
+// Last updated: <2024/11/02 20:04:58 +0900>
 //
 // Draw leaves and animation
 //
@@ -55,9 +55,9 @@ float shakingx = 100.0;
 float shakingy = 50.0;
 
 void setup() {
-  fullScreen(P2D);
+  // fullScreen(P2D);
   // size(1280, 720, P2D);
-  // size(1600, 900, P2D);
+  size(1600, 900, P2D);
 
   scrw = width;
   scrh = height;
@@ -126,6 +126,7 @@ void setup() {
     .setColorActive(color(0, 200, 0))
     .setFont(cf1);
 
+  // Set area to disable brush
   float pad = 32;
   dis_x0 = x - pad;
   dis_y0 = y - pad;
@@ -228,9 +229,41 @@ void draw() {
     text("Q,ESC: Exit / R: Reset / Z: Undo / T: Text on/off / S: Save frames", tx, 4 * td);
     text("C: Change image [" + imgkind + "] / F: Framerate [" + fps_list[fps_kind] + " fps]", tx, 5 * td);
     text("Wheel: Brush size", tx, 6 * td);
+
+    // draw brush image
+    draw_brush_preview();
   }
 
   if (exitfg) exit();
+}
+
+void draw_brush_preview() {
+  float w = 128;
+  float x = 0;
+  float y = scrh - w - 1;
+
+  // fill background
+  rectMode(CORNER);
+  noStroke();
+  fill(0, 64);
+  rect(x, y, w, w);
+
+  // draw brush image
+  imageMode(CORNER);
+  noTint();
+  image((imgkind == 0)? img : img2, x, y, w, w);
+
+  // draw border
+  rectMode(CORNER);
+  stroke(255);
+  strokeWeight(1);
+  noFill();
+  rect(x, y, w, w);
+
+  // draw text
+  noStroke();
+  fill(255);
+  text("Brush image", x, y - 6);
 }
 
 void mouseWheel(MouseEvent ev) {
@@ -239,7 +272,7 @@ void mouseWheel(MouseEvent ev) {
   change_brush_size(f);
 }
 
-void change_brush_size(float f){
+void change_brush_size(float f) {
   float bsize = slider_bsize.getValue();
   if ( f < 0) {
     bsize -= 10.0;
