@@ -13,7 +13,7 @@ Processinとパーリンノイズで葉っぱ画像を揺らして、それら�
 Screenshots
 -----------
 
-![Screenshots](./screenshots/sketch_draw_leaves_ss02.png)
+![Screenshots](./screenshots/sketch_draw_leaves_ss03.png)
 
 [Screenshot movie (YouTube)](https://youtu.be/GQ458NYrCw8)
 

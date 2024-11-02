@@ -62,7 +62,7 @@ float shakingy = 50.0;
 void setup() {
   fullScreen(P2D);
   // size(1280, 720, P2D);
-  // size(1600, 900, P2D);
+   //size(1600, 900, P2D);
 
   scrw = width;
   scrh = height;
